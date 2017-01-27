@@ -188,8 +188,14 @@ sessioncontrol =
 };
 
 ```
-If you would like to enable aux input on boot simply add the following to `/etc/rc.local`:
-`/usr/bin/arecord -D plughw:2 -f dat | /usr/bin/aplay -D plughw:2 -f dat&`
+If you would like to enable aux input on boot simply add the following to 
+
+`/etc/rc.local`:
+
+
+```
+/usr/bin/arecord -D plughw:2 -f dat | /usr/bin/aplay -D plughw:2 -f dat&
+```
 
 Now we are done with shairport-sync.
 
