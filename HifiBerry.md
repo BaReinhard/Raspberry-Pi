@@ -224,9 +224,10 @@ Now we are done with shairport-sync and done setting up the Pi to run as an AirP
 
 As far as shairport-sync goes you can use any scripts that you so choose and do not need to use shell scripts I have included here you are free to create your own scripts and have them do whatever you see fit.
 
-#Please note, in the scripts you will need to use full path names `/bin/kill` instead of `kill` or `/usr/bin/amixer` instead of `amixer`. In addition, do not use `sudo` as these scripts are run with root permission and you will likely have a bad time if you include `sudo`.
+## Please note:
+in the scripts you will need to use full path names `/bin/kill` instead of `kill` or `/usr/bin/amixer` instead of `amixer`. In addition, do not use `sudo` as these scripts are run with root permission and you will likely have a bad time if you include `sudo`.
 
-Which leads me to some of the issues I have encountered during the inital testing and setup. I will explain the issues and explain how to not run into the same issues I did.
+Which leads me to some of the issues I have encountered during the inital testing and setup.
 
 During my initial project, I hadn't decided to use an AUX input and liked the idea of using a script that made sure that during the hours my daughter would be sleeping to set the max volume to a point where if the device connected would accidentally be turned all the way up it would not be loud enough to wake her. Then during the hours she was awake the max volume would be set higher to be heard through the house. After this I decided to add a fade script that would slowly fade the volume to the set based on the time. Had everything working and the only mistakes I had made thus far were in regards to how to program in shell.
 
