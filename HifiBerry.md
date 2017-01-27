@@ -110,7 +110,15 @@ Now we can enable `shairport-sync` through systemctl so it will be running after
 sudo systemctl enable shairport-sync
 ```
 Next, we will setup some basic settings:
-We need to create 3 files `shairportstart.sh` and `shairportend.sh` and `shairportfade.sh`
+We need to create 3 files `shairportstart.sh` and `shairportend.sh` and `shairportfade.sh` and should be located in your home directory in a folder called shScripts:
+
+```
+cd ~
+sudo mkdir shScripts
+cd shScripts
+sudo nano shairportstart.sh
+```
+
 shairportstart.sh should include:
 
 ```
@@ -121,7 +129,9 @@ if [ $(date +%H) -ge "18" -o $(date +%H) -le "7" ]; then
 else
         /usr/bin/amixer set Master 100%
 fi
-/home/pi/shScripts/shairportfade.sh&
+# ----------- Be sure to change your directory path here
+#/home/osmc/shScripts/shairportfade.sh& #if using OSMC
+/home/pi/shScripts/shairportfade.sh& #if using raspbian
 
 exit 0
 ```
@@ -167,8 +177,13 @@ Then under Session control you will want to add the following:
 ```
 sessioncontrol =
 {
-  run_this_before_play_begins = "YOURHOMEPATH/shairportstart.sh";
-  run_this_after_play_ends = "YOURHOMEPATH/shairportend.sh";
+// If using Raspbian
+  run_this_before_play_begins = "/home/pi/shScripts/shairportstart.sh";
+  run_this_after_play_ends = "/home/pi/shScripts/shairportend.sh";
+// If using OSMC
+  //run_this_before_play_begins = "/home/osmc/shScripts/shairportstart.sh";
+  //run_this_after_play_ends = "/home/osmc/shScripts/shairportend.sh";
+  
   wait_for_completion = "yes";
 };
 
