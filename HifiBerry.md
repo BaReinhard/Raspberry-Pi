@@ -44,6 +44,39 @@ network={
 ```
 Now save and exit. Run the following commands to get the WiFi to register if it doesn't automatically. `sudo ifdown wlan0` then `sudo ifup wlan0`.
 
+Now we need to setup our soundcards:
+
+```
+sudo apt-get update
+sudo apt-get upgrade
+sudo apt-get isntall alsa-utils
+sudo nano /etc/asound.conf
+```
+Add the following to the asound.conf:
+
+```
+pcm.!default {
+  type hw card 1
+}
+ctl.!default {
+  type hw card 1
+}
+```
+Next we will add the indexing for our sound cards:
+
+```
+sudo nano /etc/modprobe.d/alsa-base.conf
+
+options snd_bcm2835 index = 0
+options snd_rpi_hifiberry_amp index = 1
+```
+Since I have had issues including the USB sound card in the base configuration file I typically will exclude it, this way it will show up as the last slot.
+```
+sudo reboot
+```
+You can do a quick check after the reboot to ensure the sound cards have been setup properly, `aplay -l`.
+
+
 Now we need to setup our AirPlay functionality through `shairport-sync` a fabulous open source project headed by Mike Brady at https://github.com/mikebrady/shairport-sync
 Some of the following steps aren't necessary, but I decided to do them all in case I ran into any trouble with a different setup.
 I will list the following commands you will need to execute:
@@ -77,6 +110,41 @@ Now we can enable `shairport-sync` through systemctl so it will be running after
 sudo systemctl enable shairport-sync
 ```
 Next, we will setup some basic settings:
+We need to create 3 files `shairportstart.sh` and `shairportend.sh` and `shairportfade.sh`
+shairportstart.sh should include:
+
+```
+#!/bin/sh
+/bin/pkill arecord
+if [ $(date +%H) -ge "18" -o $(date +%H) -le "7" ]; then
+        /usr/bin/amixer set Master 40%
+else
+        /usr/bin/amixer set Master 100%
+fi
+/home/pi/shScripts/shairportfade.sh&
+
+exit 0
+```
+shairportend.sh should include:
+
+```
+#!/bin/sh
+/usr/bin/amixer set Master 70%
+/usr/bin/arecord -D plughw:2 -f dat | /usr/bin/aplay -D plughw:2 -f dat&
+exit 0
+```
+shairportfade.sh should include:
+
+```
+#!/bin/sh
+/usr/bin/amixer set Master 30-
+sleep 2
+for (( i=0; i<30; i++))
+do  
+    /usr/bin/amixer set Master 1+
+done
+exit 0
+```
 
 ```
 sudo nano /etc/shairport-sync.conf
@@ -86,12 +154,27 @@ Under the General you will want to add the following:
 ```
 general =
 {
-    name = "Front Room";
+    name = "Front Room"; // This can be any name you want your device to show up as
     password = "secret"; // you can remove password if you don't want a password
     interpolation = "soxr";
     
 };
 
 ```
+Then under Session control you will want to add the following:
+
+
+```
+sessioncontrol =
+{
+  run_this_before_play_begins = "YOURHOMEPATH/shairportstart.sh";
+  run_this_after_play_ends = "YOURHOMEPATH/shairportend.sh";
+  wait_for_completion = "yes";
+};
+
+```
+If you would like to enable aux input on boot simply add the following to `/etc/rc.local`:
+`/usr/bin/arecord -D plughw:2 -f dat | /usr/bin/aplay -D plughw:2 -f dat&`
+
 Now we are done with shairport-sync.
-Next, we will be setting up the sound cards so that can we properly
+
