@@ -279,3 +279,4 @@ I took a step back and finally realized the issue is that I am using `sudo` when
 If you enjoyed reading this, are interested in other projects, enjoy programming and technology, or just want to reach out. Please feel free to follow me on [GitHub](https://github.com/bareinhard) , on [Instagram](https://instagram.com/bareinhard), or follow my [Personal Tech Blog](https://bareinhard.github.io)
 
 Thanks for reading!
+Brett
