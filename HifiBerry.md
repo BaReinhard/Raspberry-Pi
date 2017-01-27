@@ -276,3 +276,6 @@ I first had to look at how to combat this issue, so I read that it needed a pass
 I took a step back and finally realized the issue is that I am using `sudo` when its completely unnecessary. The script is already being run as root, since each child process inherits the permissions and ownerships of its parent process. Meaning `shairportstart.sh` has root permissions, further meaning `sudo` is unnecessary! After I realized this I removed `sudo` from the script and simply changed the first line to `pkill arecord`, removed the line from `/etc/rc.local`, then re-enabled shairport-sync `sudo systemctl enable shairport-sync` and rebooted the pi. I tested it out and it worked like it should have the first time had I remembered a simple lesson that everyone should know. 
 #### "Do not call sudo in a shell script it is better to run sudo shairportstart.sh. There is no need to sudo as root."
 
+If you enjoyed reading this, are interested in other projects, enjoy programming and technology, or just want to reach out. Please feel free to follow me on [GitHub](https://github.com/bareinhard) , on [Instagram](https://instagram.com/bareinhard), or follow my [Personal Tech Blog](https://bareinhard.github.io)
+
+Thanks for reading!
