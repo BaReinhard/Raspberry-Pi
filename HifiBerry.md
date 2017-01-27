@@ -197,5 +197,45 @@ If you would like to enable aux input on boot simply add the following to
 /usr/bin/arecord -D plughw:2 -f dat | /usr/bin/aplay -D plughw:2 -f dat&
 ```
 
-Now we are done with shairport-sync.
+Now we are done with shairport-sync and done setting up the Pi to run as an AirPlay receiver.
+
+As far as shairport-sync goes you can use any scripts that you so choose and do not need to use shell scripts I have included here.
+
+However, this leads me to some of the issues I have encountered during the inital testing and setup. I will explain the issues and explain how to not run into the same issues I did.
+
+During my initial project, I hadn't decided to use an AUX input and liked the idea of using a script that made sure that during the hours my daughter would be sleeping to set the max volume to a point where if the device connected would accidentally be turned all the way up it would not be loud enough to wake her. Then during the hours she was awake the max volume would be set higher to be heard through the house. After this I decided to add a fade script that would slowly fade the volume to the set based on the time. Had everything working and the only mistakes I had made thus far were in regards to how to program in shell.
+
+Now comes the introduction of the second sound card. I was able to setup the second sound card, play to it and from it no problem with the following line :
+
+```
+arecord -D plughw:2 -f dat | aplay -D plughw:2 -f dat&
+```
+And I was able to kill it with the following code:
+
+```
+sudo pkill arecord
+```
+I then decided this would be a perfect implementation to have `sudo pkill arecord` command added to the beginning of `shairportstart.sh` and have the `arecord -D plughw:2 -f dat | aplay -D plughw:2 -f dat&` added to the end of `shairportend.sh`.
+
+After I implemented it it restarted the pi and connected my device via the aux cable and grabbed another iPad to connect via AirPlay. First the AirPlay connected successfully, then I disconnected from AirPlay and BOOM! my aux connected device started playing. I was sitting here thinking to myself "This is sooooo cool it actually worked". Then I connected the iPad back to AirPlay, as I sit still listening the my aux device. I couldn't couldn't understand where I went wrong. I immediately went back to the `pkill command` and checked that syntax was correct, everything checked out. Next, execute the script via `bash -x shairportstart.sh` it properly executes everything and now no noise. I spend some time researching `shairport-sync` and how I should use the sessioncontrol functionality. I see that they suggest ensuring that a shebang (`#!/bin/sh or #!/bin/bash or #!/usr/bin/python`) is being used and that you use full path names for each command (`/bin/pkill`). So naturally I use full pathnames and ensure the shebang is error free. Reboot and try again, still nothing...
+Now I'm beginning to get some what flustered and begin trying some other ways of killing scripts, thinking that pkill was the issue.
+I tried:
+
+```
+grep arecord | sed s/' arecord'// | xargs sudo kill
+pgrep -l arecord | sed s/' arecord'// | xargs sudo kill
+pgrep arecord | sudo kill
+/bin/ps -ef | /bin/grep are | /bin/grep -v /bin/grep | /usr/bin/awk '{print $2}'| /usr/bin/xargs /usr/bin/sudo /bin/kill
+```
+Still none of them work. Then I add a loggin portion to the script to see what usr is running it and its working directory. I run the script and no logging occurs. Eventually, I stumble upon something and kill the instance of shairport-sync then start it with the command line. I test it and the scripts work properly! Finally, I fixed it!
+
+I then disabled shairport-sync through systemctl and added shairport-sync to my `/etc/rc.local` file, rebooted and tested it again. It works again. Success!
+
+I left it this way for about a day, then the thought of why it wasn't working prior started nagging at me. So, I start doing research the best way I know how, Google! Hours and hours have gone by and I still wasn't any closer to figuring out why, so naturally I call the "Justice League" aka stackoverflow, obviously. I get some answers back, but nothing to really explain to me why it happens. Since, both systemd and rc.local run programs as root it just didn't make sense to me. So after a day or so of back and forth with some users who are far smarter than I am, I was finally able to get a grasp on what was going on and why things weren't working out and I finally thought to look at the syslog in `/var/log/syslog` to find the following error:
+
+```
+Jan 24 00:38:45 raspberrypi shairport-sync[617]: sudo: no tty present and no askpass program specified
+```
+I first had to look at how to combat this issue, so I read that it needed a password passed to it. Well since shairport-sync doesn't have a passwd I initially gave it one and echoed my password to it and that worked, but that solution seemed unsecure and nagged at me. 
+I took a step back and finally realized the issue is that I am using `sudo` when its completely unnecessary. The script is already being run as root, since each child process inherits the permissions and ownerships of its parent process. Meaning `shairportstart.sh` has root permissions, further meaning `sudo` is unnecessary! After I realized this I removed `sudo` from the script and simply changed the first line to `pkill arecord`, removed the line from `/etc/rc.local`, then re-enabled shairport-sync `sudo systemctl enable shairport-sync` and rebooted the pi. I tested it out and it worked like it should have the first time had I remembered a simple lesson that everyone should know. "Do not call sudo in a shell script it is better to run sudo shairportstart.sh. There is no need to sudo as root."
 
