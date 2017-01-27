@@ -5,8 +5,9 @@ Currently, I have a 13 month daughter who listens to lullabies while she sleeps.
 One night, we went in and turned it off only to find that we had woken her up in the process. Needless to say it was a long night and was the birth of this project.
 
 The project will require the following:
-microSD card 8GB or larger
-Raspberry Pi 3 or Pi Zero,A,B+,B + WiFi Adapter
+
+* microSD card 8GB or larger
+* Raspberry Pi 3 or Pi Zero,A,B+,B + WiFi Adapter
 OSMC or Raspbian Jessie
 HiFiBerry AMP+ or HiFiBerry of your choice
 An additional USB Sound Card (I used a Sabrent, with a mic input)
