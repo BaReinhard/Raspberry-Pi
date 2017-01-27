@@ -176,6 +176,12 @@ done
 exit 0
 ```
 
+#### Now while we are still in the directory shScripts:
+
+```
+sudo chmod +x *
+```
+
 
 Now we will setup the `shairport-sync` configuration file:
 
