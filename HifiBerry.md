@@ -34,22 +34,37 @@ If using Raspbian, you will need to run the following command : `sudo raspi-conf
 Now with your spare keyboard, lets first setup WiFi access. Most WiFi dongles I have come across are now supported on the latest OS's and won't need any special drivers.
 
 So lets first scan for the WiFi network we want:
-`sudo iwlist wlan0 scan | grep ESSID`
-You should see output similar to : `ESSID: TWC21721`. Next we will need to add the following information to our wpa_supplicant file: `sudo nano /etc/wpa_supplicant/wpa_supplicant.conf
+
 ```
+sudo iwlist wlan0 scan | grep ESSID
+```
+You should see output similar to : 
+
+```
+ESSID: TWC21721
+```
+Next we will need to add the following information to our wpa_supplicant file:
+
+```
+sudo nano /etc/wpa_supplicant/wpa_supplicant.conf
+ 
 network={
   ssid="TWC21721"
   psk="YOUR_WIFI_PASSWORD"
   }
 ```
-Now save and exit. Run the following commands to get the WiFi to register if it doesn't automatically. `sudo ifdown wlan0` then `sudo ifup wlan0`.
+Now save and exit. Run the following commands to get the WiFi to register if it doesn't automatically. 
 
+```
+sudo ifdown wlan0
+sudo ifup wlan0
+```
 Now we need to setup our soundcards:
 
 ```
 sudo apt-get update
 sudo apt-get upgrade
-sudo apt-get isntall alsa-utils
+sudo apt-get install alsa-utils
 sudo nano /etc/asound.conf
 ```
 Add the following to the asound.conf:
@@ -71,10 +86,15 @@ options snd_bcm2835 index = 0
 options snd_rpi_hifiberry_amp index = 1
 ```
 Since I have had issues including the USB sound card in the base configuration file I typically will exclude it, this way it will show up as the last slot.
+
 ```
 sudo reboot
 ```
-You can do a quick check after the reboot to ensure the sound cards have been setup properly, `aplay -l`.
+You can do a quick check after the reboot to ensure the sound cards have been setup properly, 
+
+```
+aplay -l
+```
 
 
 Now we need to setup our AirPlay functionality through `shairport-sync` a fabulous open source project headed by Mike Brady at https://github.com/mikebrady/shairport-sync
@@ -156,6 +176,9 @@ done
 exit 0
 ```
 
+
+Now we will setup the `shairport-sync` configuration file:
+
 ```
 sudo nano /etc/shairport-sync.conf
 ```
@@ -199,9 +222,11 @@ If you would like to enable aux input on boot simply add the following to
 
 Now we are done with shairport-sync and done setting up the Pi to run as an AirPlay receiver.
 
-As far as shairport-sync goes you can use any scripts that you so choose and do not need to use shell scripts I have included here.
+As far as shairport-sync goes you can use any scripts that you so choose and do not need to use shell scripts I have included here you are free to create your own scripts and have them do whatever you see fit.
 
-However, this leads me to some of the issues I have encountered during the inital testing and setup. I will explain the issues and explain how to not run into the same issues I did.
+#Please note, in the scripts you will need to use full path names `/bin/kill` instead of `kill` or `/usr/bin/amixer` instead of `amixer`. In addition, do not use `sudo` as these scripts are run with root permission and you will likely have a bad time if you include `sudo`.
+
+Which leads me to some of the issues I have encountered during the inital testing and setup. I will explain the issues and explain how to not run into the same issues I did.
 
 During my initial project, I hadn't decided to use an AUX input and liked the idea of using a script that made sure that during the hours my daughter would be sleeping to set the max volume to a point where if the device connected would accidentally be turned all the way up it would not be loud enough to wake her. Then during the hours she was awake the max volume would be set higher to be heard through the house. After this I decided to add a fade script that would slowly fade the volume to the set based on the time. Had everything working and the only mistakes I had made thus far were in regards to how to program in shell.
 
