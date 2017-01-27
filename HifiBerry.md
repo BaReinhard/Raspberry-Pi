@@ -33,17 +33,17 @@ If using Raspbian, you will need to run the following command : `sudo raspi-conf
 
 Now with your spare keyboard, lets first setup WiFi access. Most WiFi dongles I have come across are now supported on the latest OS's and won't need any special drivers.
 
-So lets first scan for the WiFi network we want:
+##### So lets first scan for the WiFi network we want:
 
 ```
 sudo iwlist wlan0 scan | grep ESSID
 ```
-You should see output similar to : 
+##### You should see output similar to : 
 
 ```
 ESSID: TWC21721
 ```
-Next we will need to add the following information to our wpa_supplicant file:
+##### Next we will need to add the following information to our wpa_supplicant file:
 
 ```
 sudo nano /etc/wpa_supplicant/wpa_supplicant.conf
